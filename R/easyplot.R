@@ -6,8 +6,10 @@
 #' @return a flip barplot
 #' @export
 barFlip <- function(data,x,y){
-	data[,x] <- as.character(data[,x])
-	data[,x] <- factor(data[,x],levels=rev(data[,x]))
+	data$xPlot <- as.character(data[,x])
+	data$yPlot <- data[,y]
+	
+	data$xPlot <- factor(data$xPlot,levels=rev(data$xPlot))
 
 	num_p_sig <- length(which(data$adj.P.Val < 0.05 & data$t > 0))
 	num_n_sig <- length(which(data$adj.P.Val < 0.05 & data$t < 0))
@@ -17,11 +19,11 @@ barFlip <- function(data,x,y){
 	data$color.txt <- c(rep("black",num_p_sig),rep(gray(0.5),num_non_sig),rep("black",num_n_sig))
 
 	data$hjust <- ifelse(data$t>0,1,0)
-	ax.limits <- ceiling(max(abs(data$y)))
+	ax.limits <- ceiling(max(abs(data$yPlot)))
 
-	plot <- ggplot(data,aes(x=x,y=y)) + 
-		geom_text(aes(y=0,label=x,hjust=hjust),color=data$color.txt) + 
-		geom_bar(aes(fill=x),stat="identity") + 
+	plot <- ggplot(data,aes(x=xPlot,y=yPlot)) + 
+		geom_text(aes(y=0,label=xPlot,hjust=hjust),color=data$color.txt) + 
+		geom_bar(aes(fill=xPlot),stat="identity") + 
 		scale_fill_manual(values=rev(data$color.bar)) +
 		coord_flip() + 
 		theme(legend.position='none')+
